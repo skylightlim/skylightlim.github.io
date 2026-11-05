@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Skyline QR city</title>
+    <meta name="description" content="Someone turned a link into a city that folds into its own QR code." />
+    <style>
+      :root {
+        --paper: #f6f4ef;
+        --card: #ffffff;
+        --ink: #1c1f26;
+        --muted: #5b6170;
+        --accent: #1f5c99;
+        --line: #e2ddd3;
+        color-scheme: light dark;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --paper: #0b0e14;
+          --card: #151a24;
+          --ink: #e9ebf1;
+          --muted: #a7aec0;
+          --accent: #9fd0ff;
+          --line: #262d3b;
+        }
+      }
+      * { box-sizing: border-box; }
+      /* The display rules below would otherwise beat the hidden attribute. */
+      [hidden] { display: none !important; }
+      body {
+        margin: 0;
+        min-height: 100dvh;
+        background: var(--paper);
+        color: var(--ink);
+        font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        display: grid;
+        place-items: center;
+        padding: 24px 16px;
+      }
+      main { width: 100%; max-width: 420px; }
+      .eyebrow { margin: 0 0 4px; color: var(--muted); font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
+      h1 { margin: 0 0 20px; font-size: 26px; line-height: 1.2; overflow-wrap: anywhere; }
+      .code { background: #ffffff; border-radius: 16px; padding: 18px; border: 1px solid var(--line); }
+      .code svg { display: block; width: 100%; height: auto; }
+      .meta { display: flex; justify-content: space-between; gap: 12px; margin: 14px 2px 22px; color: var(--muted); font-size: 14px; }
+      .meta b { color: var(--ink); font-family: ui-monospace, "SF Mono", Menlo, monospace; font-weight: 600; }
+      a.button {
+        display: block; text-align: center; text-decoration: none; font-weight: 600;
+        padding: 14px 16px; border-radius: 12px; margin-top: 10px;
+      }
+      a.primary { background: var(--accent); color: var(--paper); overflow-wrap: anywhere; }
+      .note { color: var(--muted); font-size: 14px; margin-top: 22px; }
+      .note a { color: var(--accent); }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js" integrity="sha384-mZT2gIty7ZDdOGkxfP6joZcYdMW1Jvj9dRlfpTmaJAKKXTqzygtB22k7FLe+KZC1" crossorigin="anonymous"></script>
+    <script src="city.js"></script>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">Skyline QR</p>
+      <h1 id="title">A city someone shared with you</h1>
+      <div class="code" id="code" role="img" aria-label="QR code"></div>
+      <div class="meta" id="meta" hidden><span>City <b id="cityCode"></b></span><span id="light"></span></div>
+      <a class="button primary" id="visit" hidden></a>
+      <p class="note">
+        In the Skyline QR app this code rises into a city: every building stands on one of its
+        squares, and a tap folds the skyline back into the code.
+      </p>
+    </main>
+    <script>
+      const city = Skyline.decode(location.search);
+      const box = document.getElementById('code');
+      if (!city) {
+        document.getElementById('title').textContent = "This link doesn't hold a city";
+        box.hidden = true;
+      } else {
+        const host = new URL(city.url).host;
+        document.getElementById('title').textContent = 'A city for ' + host;
+        box.setAttribute('aria-label', 'QR code for ' + city.url);
+
+        // The same link as a plain, scannable code: dark modules on white, four modules of quiet zone.
+        const qr = qrcode(0, 'M');
+        qr.addData(city.url);
+        qr.make();
+        const n = qr.getModuleCount();
+        const quiet = 4;
+        let path = '';
+        for (let r = 0; r < n; r++) {
+          for (let c = 0; c < n; c++) {
+            if (qr.isDark(r, c)) path += 'M' + (c + quiet) + ' ' + (r + quiet) + 'h1v1h-1z';
+          }
+        }
+        const side = n + 2 * quiet;
+        box.innerHTML =
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + side + ' ' + side + '" shape-rendering="crispEdges">' +
+          '<rect width="100%" height="100%" fill="#fff"/><path fill="#1c1f26" d="' + path + '"/></svg>';
+
+        document.getElementById('cityCode').textContent = Skyline.cityCode(city.url, city.scope);
+        document.getElementById('light').textContent = city.time + ' · ' + city.weather;
+        document.getElementById('meta').hidden = false;
+        const visit = document.getElementById('visit');
+        visit.href = city.url;
+        visit.textContent = 'Go to ' + host;
+        visit.hidden = false;
+      }
+    </script>
+  </body>
+</html>

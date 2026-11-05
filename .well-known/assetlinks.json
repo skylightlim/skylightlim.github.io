@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.skylightlim.skylineqr",
+      "sha256_cert_fingerprints": [
+        "71:49:25:4E:B9:1C:9E:48:E7:E0:CD:33:21:E3:91:8A:C7:8C:83:26:B9:62:BB:73:19:C9:6C:75:01:48:F3:F9",
+        "14:6D:7D:9B:0A:3C:F4:74:3A:58:CC:AF:28:F6:B4:C7:31:E8:4B:74:BE:7B:94:A6:62:F3:F8:F2:89:37:39:A9"
+      ]
+    }
+  }
+]
