@@ -4,7 +4,7 @@ These files belong in the root of the `skylightlim/skylightlim.github.io` reposi
 Pages serves at `https://skylightlim.github.io/`:
 
 - `city/` is the page a share link opens when Skyline QR is not installed: the link's QR code, the
-  city's code and a link to the app.
+  city's code and a button to the link itself.
 - `.well-known/assetlinks.json` lets Android open share links straight in the app. It lists the
   release key's fingerprint (and the local debug keys', for testing: Gradle here signs debug builds
   with ~/.config/.android/debug.keystore). App Links verify against the
